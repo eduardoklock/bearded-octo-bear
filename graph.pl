@@ -1,6 +1,39 @@
-%graph
-node(city).
+% load ADT PrioQ
+:- [adtPrioQ].
 
+% astar/2
+astar(StartState,'Itapiranga') :-
+    city(StartState),
+    distance_to_itapiranga(StartState,H),
+    astar([node(StartState,0,H,nil)],[StartState],EndNode,'Itapiranga'),
+    printPath(EndNode).
+
+% astar/4
+astar(Fringe,_ ,node(search_failed,nil), _) :-
+    isEmptyPrioQ(Fringe).
+
+astar(Fringe, _, Node, GoalState) :-
+    peekPrioQ(Node,Fringe),
+    isGoalState(Node,GoalState).
+
+astar(Fringe, Explored, EndNode, GoalState) :-
+    delete(Node,Fringe,Fringe2),
+    expand(Node,Explored,NewExplored,Fringe2,NewFringe),
+    astar(NewFringe,NewExplored,EndNode,GoalState).
+
+
+% isGoalState/2
+isGoalState(node(State,_G,_F,_Action,_Parent),State).
+
+% expand/5
+expand(Node,Explored,NewExplored,Fringe,NewFringe) :-
+    findall(N,parent(Node,N),NewNodes),
+    addNewNodes(NewNodes,Explored,NewExplored,Fringe,NewFringe).
+    
+
+
+
+%graph
 city('Araranguá').
 city('Blumenau').
 city('Bom Retiro').
@@ -30,7 +63,6 @@ city('São Miguel do Oeste').
 city('Xanxerê').
 
 edge(city, city, distance).
-
 edge('Florianópolis', 'Palhoça', 20).
 edge('Florianópolis', 'Itajaí', 70).
 edge('Palhoça', 'Itajaí', 80).
@@ -106,4 +138,3 @@ distance_to_itapiranga('Porto União', 86.3239288).
 distance_to_itapiranga('São Lourenço', 36.6222413).
 distance_to_itapiranga('São Miguel do Oeste', 14.9680813).
 distance_to_itapiranga('Xanxerê', 41.513169).
-
